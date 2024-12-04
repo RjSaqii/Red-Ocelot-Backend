@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 
-# Simulated commit data
+# Simulated commit data, will be replaced by database later
 commit_history = [
     {"repo": "Cobol2XML", "commit_date": "2023-12-01", "commit_message": "Initial commit", "commit_author": "julianbass"}, 
     {"repo": "fhir-data-pipes", "commit_date": "2023-12-02", "commit_message": "Added feature for data transformation", "commit_author": "johndoe"}, 
