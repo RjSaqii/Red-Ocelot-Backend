@@ -1,6 +1,8 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
+import json
+
 
 # Simulated commit data, will be replaced by database later
 commit_history = [
@@ -27,13 +29,20 @@ def commits_per_repo():
     return pio.to_html(fig, full_html=True)
 
 # 2. Commits By Author
-def commits_by_author():
-    authors = ["Author1", "Author2", "Author3"]
-    commits = [10, 15, 5]
 
-    # Create a pie chart
-    fig = go.Figure(data=[go.Pie(labels=authors, values=commits)])
-    return pio.to_html(fig, full_html=True)
+#Generate a pie chart from commit counts
+def generate_pie_chart(data):
+
+    # Create a pie chart using the array of dictionaries
+    fig = px.pie(
+        data_frame=data,
+        names="author",  # Use 'author' as the label
+        values="commit_count",  # Use 'count' as the value
+        title="Author Commit Distribution"
+    )
+
+    return fig.to_json()
+
 
 # 3. Commits Heatmap
 def commits_heatmap():

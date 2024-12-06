@@ -47,3 +47,50 @@ def execute_query(query: str, params: list = None):
 def getRepoNamesData():
     return execute_query("SELECT name FROM repositories")
 
+def getAuthors(authorName):
+
+    query = """ 
+        SELECT DISTINCT
+            author 
+        FROM 
+            commits 
+        WHERE repository_id = (
+            SELECT id
+            FROM repositories
+            WHERE name = %s
+        )
+"""
+    # query.replace("?", authorName)
+    print("----")
+    print(authorName)
+    print("----")
+    print(query)
+    param = (authorName,)
+    return execute_query(query,param)
+
+def getAuthorCommitsByRepoName(repoNames):
+
+    query = """ 
+        SELECT 
+            author, 
+			COUNT(*) AS commit_count
+        FROM 
+            commits 
+        WHERE repository_id = (
+            SELECT id
+            FROM repositories
+            WHERE name = 'fhir-data-pipes'
+        )
+		GROUP BY 
+		author
+		ORDER BY commit_count DESC
+"""
+    # query.replace("?", authorName)
+    print("----")
+    print(repoNames)
+    print("----")
+    print(query)
+    param = (repoNames,)
+    return execute_query(query,param)
+
+
