@@ -4,11 +4,11 @@ import plotly.io as pio
 
 # Simulated commit data, will be replaced by database later
 commit_history = [
-    {"repo": "Cobol2XML", "commit_date": "2023-12-01", "commit_message": "Initial commit", "commit_author": "julianbass"}, 
-    {"repo": "fhir-data-pipes", "commit_date": "2023-12-02", "commit_message": "Added feature for data transformation", "commit_author": "johndoe"}, 
-    {"repo": "Dubbo", "commit_date": "2023-12-03", "commit_message": "Refactored utility classes", "commit_author": "janedoe"}, 
-    {"repo": "Cobol2XML", "commit_date": "2023-12-04", "commit_message": "Fixed parsing bug", "commit_author": "julianbass"},
-    {"repo": "Dubbo", "commit_date": "2023-12-05", "commit_message": "Added new API endpoints", "commit_author": "janedoe"}
+    {"repo": "Cobol2XML", "commit_date": "2023-12-01", "commit_message": "Initial commit", "commit_author": "julianbass", "file_sizes": [200, 500, 120, 300, 50]}, 
+    {"repo": "fhir-data-pipes", "commit_date": "2023-12-02", "commit_message": "Added feature for data transformation", "commit_author": "johndoe", "file_sizes": [1000, 2000, 1500, 500]},
+    {"repo": "Dubbo", "commit_date": "2023-12-03", "commit_message": "Refactored utility classes", "commit_author": "janedoe", "file_sizes": [300, 400, 700, 100, 200, 300]},
+    {"repo": "Cobol2XML", "commit_date": "2023-12-04", "commit_message": "Fixed parsing bug", "commit_author": "julianbass", "file_sizes": [600, 250, 400]},
+    {"repo": "Dubbo", "commit_date": "2023-12-05", "commit_message": "Added new API endpoints", "commit_author": "janedoe", "file_sizes": [800, 1000, 600]},
 ]
 
 # 1. Commits Per Repository
@@ -59,13 +59,36 @@ def commits_heatmap():
     return pio.to_html(fig, full_html=True)
 
 # 4. Commits Histogram
-def commits_histogram():
-    dates = [commit["commit_date"] for commit in commit_history]
+def generate_histogram(histogram_type, repo_name=None):
+    if histogram_type == "commits":
+        # Commits Histogram
+        dates = [commit["commit_date"] for commit in commit_history]
+        fig = go.Figure(data=[go.Histogram(x=dates)])
+        fig.update_layout(
+            title="Commits by Day",
+            xaxis_title="Date",
+            yaxis_title="Number of Commits"
+        )
+    elif histogram_type == "file_sizes":
+        # File Size Histogram
+        if not repo_name:
+            return "<h1>Error: 'repo_name' is required for file size histogram</h1>"
+        repo_data = next((repo for repo in commit_history if repo["repo"] == repo_name), None)
+        if not repo_data:
+            return f"<h1>Repository '{repo_name}' not found</h1>"
+        file_sizes = repo_data["file_sizes"]
+        fig = go.Figure(data=[go.Histogram(x=file_sizes, nbinsx=10)])
+        fig.update_layout(
+            title=f"File Size Distribution in {repo_name}",
+            xaxis_title="File Size (KB)",
+            yaxis_title="Number of Files"
+        )
+    else:
+        return "<h1>Error: Invalid histogram type. Use 'commits' or 'file_sizes'.</h1>"
 
-    # Create a histogram
-    fig = go.Figure(data=[go.Histogram(x=dates)])
-    fig.update_layout(title="Commits by Day", xaxis_title="Date", yaxis_title="Number of Commits")
+    # Convert the figure to HTML
     return pio.to_html(fig, full_html=True)
+
 
 
 
