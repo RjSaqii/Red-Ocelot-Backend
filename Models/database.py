@@ -29,10 +29,10 @@ def execute_query(query: str, params: list = None):
 
         # Fetch and format the results
         rows = cursor.fetchall()
-        print(rows)
-        formatted_results = [{key: value} for row in rows for key, value in row.items()]
+        #print(rows)
+        #formatted_results = [{key: value} for row in rows for key, value in row.items()]
         connection.close()
-        return formatted_results
+        return rows
 
     except Exception as e:
         # Log or raise the error as needed
@@ -61,10 +61,10 @@ def getAuthors(authorName):
         )
 """
     # query.replace("?", authorName)
-    print("----")
-    print(authorName)
-    print("----")
-    print(query)
+    #print("----")
+    #print(authorName)
+    #print("----")
+    #print(query)
     param = (authorName,)
     return execute_query(query,param)
 
@@ -79,17 +79,17 @@ def getAuthorCommitsByRepoName(repoNames):
         WHERE repository_id = (
             SELECT id
             FROM repositories
-            WHERE name = 'fhir-data-pipes'
+            WHERE name = %s
         )
 		GROUP BY 
 		author
 		ORDER BY commit_count DESC
 """
     # query.replace("?", authorName)
-    print("----")
-    print(repoNames)
-    print("----")
-    print(query)
+    #print("----")
+    #print(repoNames)
+    #print("----")
+    #print(query)
     param = (repoNames,)
     return execute_query(query,param)
 

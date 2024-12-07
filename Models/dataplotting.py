@@ -30,10 +30,10 @@ def commits_per_repo():
 
 # 2. Commits By Author
 
-#Generate a pie chart from commit counts
-def generate_pie_chart(data):
+#Generate plots from commit counts by author
+def generate_plots(data):
 
-    # Create a pie chart using the array of dictionaries
+    # Create raw plots used to generate a pie chart
     fig = px.pie(
         data_frame=data,
         names="author",  # Use 'author' as the label
