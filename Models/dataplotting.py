@@ -68,20 +68,32 @@ def commits_heatmap():
     return pio.to_html(fig, full_html=True)
 
 def generate_histogrammm(data):
+    # Check if data contains the required fields
+    # if "Date" not in data or "Commits" not in data:
+    #     raise ValueError("Data must contain 'Date' and 'Commits' fields")
 
-    # Extract dates and commit counts from the data
-    dates = data["Date"]  # List of commit dates
-    commit_counts = data["Commits"]  # Corresponding commit counts
+    # # Ensure data has values for x and y axes
+    # if not data["Date"] or not data["Commits"]:
+    #     raise ValueError("Date and Commits arrays must not be empty")
+
     # Create the histogram
-
     fig = px.histogram(
         data_frame=data,
+        x="Date",               # x-axis: dates (will be automatically binned)
+        y="Commits",            # y-axis: aggregate commit counts
         title="Commits Histogram",
-        x="Date",
-        y="Commits",
+        histfunc="sum"          # Sum the commits for each bin
     )
-    return fig.to_json()
 
+    # Update layout for better readability
+    fig.update_layout(
+        xaxis_title="Date",          # X-axis label
+        yaxis_title="Number of Commits",  # Y-axis label
+        bargap=0.1,                 # Reduce gap between bars
+    )
+
+    # Return the figure as JSON for the frontend
+    return fig.to_json()
 
 
 

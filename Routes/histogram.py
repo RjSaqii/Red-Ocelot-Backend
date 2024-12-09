@@ -17,6 +17,7 @@ async def get_histogram_chart(request: Request):
 
     # Generate the Plotly JSON for the pie chart
     data = getCommitsPerDay(repoName, startdate, enddate)
+    print(data)
     date_array = []
     commitsCount_array = []
 
@@ -32,5 +33,4 @@ async def get_histogram_chart(request: Request):
     
     
     fig = generate_histogrammm(data)
-    print(fig)
     return JSONResponse(fig)
