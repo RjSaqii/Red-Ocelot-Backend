@@ -13,3 +13,25 @@ content-type: application/json
 {
     "reponame":"dubbo"
 }
+
+###
+
+POST http://127.0.0.1:8000/barchart HTTP/1.1
+content-type: application/json
+
+{
+    "reponame":"dubbo"
+}
+
+###
+
+POST http://127.0.0.1:8000/histogram HTTP/1.1
+content-type: application/json
+
+{
+    "reponame":"dubbo",
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31"
+
+    
+}

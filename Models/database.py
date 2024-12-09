@@ -94,3 +94,39 @@ def getAuthorCommitsByRepoName(repoNames):
     return execute_query(query,param)
 
 
+
+def getFilesDetailsBYRepoName(repoNames):
+
+    query = """ 
+    SELECT f.name,f.functional_line_count
+    FROM files f
+    JOIN branches b ON f.branch_id = b.id
+    JOIN repositories r ON b.repository_id = r.id
+    WHERE f.is_directory = 'false' AND r.name = %s;
+"""
+    
+    param = (repoNames,)
+    return execute_query(query,param)
+
+
+def getCommitsPerDay(repoNames, startdate, enddate):
+
+    query = """ 
+    SELECT 
+        DATE(date) AS commit_date,
+        COUNT(*) AS commit_count
+    FROM 
+        commits
+    WHERE 
+        repository_id IN (SELECT id FROM repositories WHERE name = %s)
+        AND DATE(date) BETWEEN %s AND %s
+    GROUP BY 
+        DATE(date)
+    ORDER BY 
+        commit_date;
+
+"""
+    
+    param = (repoNames,startdate,enddate)
+    return execute_query(query,param)
+

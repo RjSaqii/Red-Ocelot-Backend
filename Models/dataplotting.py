@@ -67,11 +67,29 @@ def commits_heatmap():
     )
     return pio.to_html(fig, full_html=True)
 
+def generate_histogrammm(data):
+
+    # Extract dates and commit counts from the data
+    dates = data["Date"]  # List of commit dates
+    commit_counts = data["Commits"]  # Corresponding commit counts
+    # Create the histogram
+
+    fig = px.histogram(
+        data_frame=data,
+        title="Commits Histogram",
+        x="Date",
+        y="Commits",
+    )
+    return fig.to_json()
+
+
+
+
 # 4. Commits Histogram
 def generate_histogram(histogram_type, repo_name=None):
     if histogram_type == "commits":
         # Commits Histogram
-        dates = [commit["commit_date"] for commit in commit_history]
+        dates = [["commit_date"] for commit in commit_history]
         fig = go.Figure(data=[go.Histogram(x=dates)])
         fig.update_layout(
             title="Commits by Day",
@@ -102,3 +120,15 @@ def generate_histogram(histogram_type, repo_name=None):
 
 
 
+
+def generate_barPlots(data):
+
+    # Create raw plots used to generate a pie chart
+    fig = px.bar(
+        data_frame=data,
+        x="Name",  # Column for the x-axis (repository name)
+        y="LineCount",  # Column for the y-axis (line count)
+        title="Line Count by repo name"
+    )
+
+    return fig.to_json()
