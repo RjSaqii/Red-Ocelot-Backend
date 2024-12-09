@@ -144,3 +144,36 @@ def generate_barPlots(data):
     )
 
     return fig.to_json()
+
+
+def generate_bubble_chart(data):
+    if not data:
+        raise ValueError("No data available for the bubble chart.")
+    print(data)
+    repository_names = data["repository_name"]
+    commit_counts = data["commit_count"]
+    watcher_counts = data["watcher_count"]
+    fork_counts = data["fork_count"]
+    
+    print("Repository Names:", repository_names)
+    print("Watcher Counts:", watcher_counts)
+    print("Commit Counts:", commit_counts)
+    print("Fork Counts:", fork_counts)
+    print("Lengths:", len(repository_names), len(watcher_counts), len(commit_counts), len(fork_counts))
+
+
+    min_size = 20  # Minimum bubble size
+    scale_factor = 100 / max(fork_counts) if max(fork_counts) > 0 else 1  # Scale so the largest bubble isn't too big
+    fork_counts = [max(min_size, size * scale_factor) for size in fork_counts]
+    
+    fig = px.scatter(
+        x=watcher_counts,
+        y=commit_counts,
+        size=fork_counts,
+        text=repository_names,
+        labels={"x": "Number of Watchers", "y": "Number of Commits"},
+        title="Commits vs. Watchers Bubble Chart",
+    )
+    fig.update_traces(textposition='top center')
+    fig.update_layout(template="plotly_white")
+    return fig.to_json()

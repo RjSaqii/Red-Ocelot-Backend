@@ -130,3 +130,21 @@ def getCommitsPerDay(repoNames, startdate, enddate):
     param = (repoNames,startdate,enddate)
     return execute_query(query,param)
 
+def getBubbleChartData():
+    query = """
+    SELECT 
+        r.name AS repository_name,
+        COUNT(c.id) AS commit_count,
+        r.watchers AS watcher_count,
+        r.forks_count AS fork_count
+    FROM 
+        commits c
+    INNER JOIN 
+        repositories r ON c.repository_id = r.id
+    GROUP BY 
+        r.id, r.name, r.watchers, r.forks_count
+    ORDER BY 
+        commit_count DESC;
+    """
+    
+    return execute_query(query)
