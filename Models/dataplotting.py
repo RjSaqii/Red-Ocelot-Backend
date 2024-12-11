@@ -67,15 +67,8 @@ def commits_heatmap():
     )
     return pio.to_html(fig, full_html=True)
 
+# 4. Commits Histogram between date range
 def generate_histogrammm(data):
-    # Check if data contains the required fields
-    # if "Date" not in data or "Commits" not in data:
-    #     raise ValueError("Data must contain 'Date' and 'Commits' fields")
-
-    # # Ensure data has values for x and y axes
-    # if not data["Date"] or not data["Commits"]:
-    #     raise ValueError("Date and Commits arrays must not be empty")
-
     # Create the histogram
     fig = px.histogram(
         data_frame=data,
@@ -94,43 +87,6 @@ def generate_histogrammm(data):
 
     # Return the figure as JSON for the frontend
     return fig.to_json()
-
-
-
-# 4. Commits Histogram
-def generate_histogram(histogram_type, repo_name=None):
-    if histogram_type == "commits":
-        # Commits Histogram
-        dates = [["commit_date"] for commit in commit_history]
-        fig = go.Figure(data=[go.Histogram(x=dates)])
-        fig.update_layout(
-            title="Commits by Day",
-            xaxis_title="Date",
-            yaxis_title="Number of Commits"
-        )
-    elif histogram_type == "file_sizes":
-        # File Size Histogram
-        if not repo_name:
-            return "<h1>Error: 'repo_name' is required for file size histogram</h1>"
-        repo_data = next((repo for repo in commit_history if repo["repo"] == repo_name), None)
-        if not repo_data:
-            return f"<h1>Repository '{repo_name}' not found</h1>"
-        file_sizes = repo_data["file_sizes"]
-        fig = go.Figure(data=[go.Histogram(x=file_sizes, nbinsx=10)])
-        fig.update_layout(
-            title=f"File Size Distribution in {repo_name}",
-            xaxis_title="File Size (KB)",
-            yaxis_title="Number of Files"
-        )
-    else:
-        return "<h1>Error: Invalid histogram type. Use 'commits' or 'file_sizes'.</h1>"
-
-    # Convert the figure to HTML
-    return pio.to_html(fig, full_html=True)
-
-
-
-
 
 
 def generate_barPlots(data):

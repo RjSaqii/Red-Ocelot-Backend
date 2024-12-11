@@ -95,21 +95,23 @@ def getAuthorCommitsByRepoName(repoNames):
 
 
 
-def getFilesDetailsBYRepoName(repoNames):
-
-    query = """ 
-    SELECT f.name,f.functional_line_count
+def getFilesDetailsBYRepoName(repoNames, no_of_lines):
+    query = """
+    SELECT f.name, f.functional_line_count
     FROM files f
     JOIN branches b ON f.branch_id = b.id
     JOIN repositories r ON b.repository_id = r.id
-    WHERE f.is_directory = 'false' AND r.name = %s;
-"""
-    
-    param = (repoNames,)
-    return execute_query(query,param)
+    WHERE f.is_directory = 'false' 
+    AND r.name = %s 
+    AND f.functional_line_count <= %s;
+    """
+
+    param = (repoNames, no_of_lines)
+    return execute_query(query, param)
 
 
-def getCommitsPerDay(repoNames, startdate, enddate):
+
+def getCommitsPerDay(repoNames, startdate, enddate, max_no_of_commits):
 
     query = """ 
     SELECT 
@@ -122,13 +124,14 @@ def getCommitsPerDay(repoNames, startdate, enddate):
         AND DATE(date) BETWEEN %s AND %s
     GROUP BY 
         DATE(date)
+    HAVING 
+        COUNT(*) <= %s
     ORDER BY 
         commit_date;
-
 """
-    
-    param = (repoNames,startdate,enddate)
+    param = (repoNames,startdate,enddate,max_no_of_commits)
     return execute_query(query,param)
+
 
 def getBubbleChartData():
     query = """

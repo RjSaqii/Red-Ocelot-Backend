@@ -20,7 +20,8 @@ POST http://127.0.0.1:8000/barchart HTTP/1.1
 content-type: application/json
 
 {
-    "reponame":"dubbo"
+    "reponame":"dubbo",
+    "no_of_lines": 1000
 }
 
 ###
@@ -31,9 +32,8 @@ content-type: application/json
 {
     "reponame":"dubbo",
     "start_date": "2019-01-01",
-    "end_date": "2024-01-31"
-
-    
+    "end_date": "2024-01-31",
+    "max_no_of_commits": "5"
 }
 
 ###

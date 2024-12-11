@@ -10,10 +10,12 @@ router = APIRouter()
 async def get_bar_chart(request: Request):
 
     body_data = await request.json()
+    print(body_data)
     repoName = body_data.get("reponame")
+    no_of_lines = body_data.get("no_of_lines")
 
     # Generate the Plotly JSON for the pie chart
-    data = getFilesDetailsBYRepoName(repoName)
+    data = getFilesDetailsBYRepoName(repoName, no_of_lines)
     file_array = []
     lineCount_array = []
 
