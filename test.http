@@ -26,6 +26,7 @@ content-type: application/json
 
 ###
 
+#Day filter
 POST http://127.0.0.1:8000/histogram HTTP/1.1
 content-type: application/json
 
@@ -33,7 +34,7 @@ content-type: application/json
     "reponame":"dubbo",
     "start_date": "2019-01-01",
     "end_date": "2024-01-31",
-    "max_no_of_commits": "5"
+    "max_no_of_commits": "1",
 }
 
 ###
@@ -42,4 +43,65 @@ GET http://127.0.0.1:8000/bubblechart HTTP/1.1
 content-type: application/json
 
 {
+}
+
+###
+
+GET http://127.0.0.1:8000/getreponamesbyuser/RjSaqii HTTP/1.1
+content-type: application/json
+
+{
+
+
+}
+
+###
+
+POST  http://127.0.0.1:8000/githubauthorpiechart/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "RjSaqii",
+    "reponame": "Red-Ocelot-Backend"
+
+}
+
+###
+
+POST  http://127.0.0.1:8000/filelinecountbyrepo/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "RjSaqii",
+    "reponame": "Red-Ocelot-Backend"
+    
+
+}
+
+
+###
+
+POST  http://127.0.0.1:8000/authorbubblechartdata/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "RjSaqii"
+    
+
+}
+
+
+###
+
+POST  http://127.0.0.1:8000/commithistogram/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "RjSaqii",
+    "reponame": "Red-Ocelot-Backend",
+    "start_date": "2024-12-01",
+    "end_date": "2024-12-11",
+    "time_filter": "month"
+    
+
 }

@@ -1,135 +1,133 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
-import json
+import pandas as pd
 
-
-# Simulated commit data, will be replaced by database later
-commit_history = [
-    {"repo": "Cobol2XML", "commit_date": "2023-12-01", "commit_message": "Initial commit", "commit_author": "julianbass", "file_sizes": [200, 500, 120, 300, 50]}, 
-    {"repo": "fhir-data-pipes", "commit_date": "2023-12-02", "commit_message": "Added feature for data transformation", "commit_author": "johndoe", "file_sizes": [1000, 2000, 1500, 500]},
-    {"repo": "Dubbo", "commit_date": "2023-12-03", "commit_message": "Refactored utility classes", "commit_author": "janedoe", "file_sizes": [300, 400, 700, 100, 200, 300]},
-    {"repo": "Cobol2XML", "commit_date": "2023-12-04", "commit_message": "Fixed parsing bug", "commit_author": "julianbass", "file_sizes": [600, 250, 400]},
-    {"repo": "Dubbo", "commit_date": "2023-12-05", "commit_message": "Added new API endpoints", "commit_author": "janedoe", "file_sizes": [800, 1000, 600]},
-]
-
-# 1. Commits Per Repository
-def commits_per_repo():
-    repo_counts = {}
-    for commit in commit_history:
-        repo_counts[commit["repo"]] = repo_counts.get(commit["repo"], 0) + 1
-    repos = list(repo_counts.keys())
-    counts = list(repo_counts.values())
-    
-    # Create a bar chart
-    fig = go.Figure(data=[go.Bar(x=repos, y=counts)])
-    fig.update_layout(title="Commits per Repository", xaxis_title="Repository", yaxis_title="Number of Commits")
-    
-    # Convert to HTML
-    return pio.to_html(fig, full_html=True)
-
-# 2. Commits By Author
-
-#Generate plots from commit counts by author
-def generate_plots(data):
-
-    # Create raw plots used to generate a pie chart
+# Commits By Author Pie Chart Plots
+def generate_plots_pie_chart(data):
+    # Generate a pie chart showing the distribution of commits by author.
     fig = px.pie(
         data_frame=data,
-        names="author",  # Use 'author' as the label
-        values="commit_count",  # Use 'count' as the value
+        names="author",  # Use 'author' as the label for the pie slices.
+        values="commit_count",  # Use 'commit_count' as the value for each slice.
         title="Author Commit Distribution"
     )
+    return fig.to_json()  # Return the chart as JSON for rendering.
 
-    return fig.to_json()
-
-
-# 3. Commits Heatmap
-def commits_heatmap():
-    repo_names = list(set(commit["repo"] for commit in commit_history))
-    commit_dates = list(set(commit["commit_date"] for commit in commit_history))
-    heatmap_data = []
-    for repo in repo_names:
-        row = []
-        for date in commit_dates:
-            count = sum(1 for commit in commit_history if commit["repo"] == repo and commit["commit_date"] == date)
-            row.append(count)
-        heatmap_data.append(row)
-    
-    # Create a heatmap
-    fig = px.imshow(
-        heatmap_data,
-        x=commit_dates,
-        y=repo_names,
-        labels=dict(x="Commit Date", y="Repository", color="Number of Commits"),
-        color_continuous_scale="Viridis",
-        title="Commits Over Time by Repository"
-    )
-    return pio.to_html(fig, full_html=True)
-
-# 4. Commits Histogram between date range
-def generate_histogrammm(data):
-    # Create the histogram
+# Commits Histogram between date range plots
+def generate_histogram_plots(data):
+    # Create a histogram to display commits over a range of dates
     fig = px.histogram(
         data_frame=data,
-        x="Date",               # x-axis: dates (will be automatically binned)
-        y="Commits",            # y-axis: aggregate commit counts
+        x="Date",                  # Dates on the x-axis
+        y="Commits",               # Commit counts on the y-axis
         title="Commits Histogram",
-        histfunc="sum"          # Sum the commits for each bin
+        histfunc="sum"             # Aggregate commit counts
     )
 
-    # Update layout for better readability
+    # Update layout to avoid automatic date binning
     fig.update_layout(
-        xaxis_title="Date",          # X-axis label
-        yaxis_title="Number of Commits",  # Y-axis label
-        bargap=0.1,                 # Reduce gap between bars
+        xaxis=dict(
+            title="Date",
+            type="category"  # Treat each date group as a distinct category
+        ),
+        yaxis_title="Number of Commits",
+        bargap=0.1  # Reduce gap between bars
     )
 
-    # Return the figure as JSON for the frontend
-    return fig.to_json()
+    return fig.to_json()  # Return the figure as JSON
 
-
-def generate_barPlots(data):
-
-    # Create raw plots used to generate a pie chart
+# Bar chart plots showing line counts by repo name
+def generate_bar_plots(data):
+    # Create a bar chart to show the line counts by repository name
     fig = px.bar(
         data_frame=data,
-        x="Name",  # Column for the x-axis (repository name)
-        y="LineCount",  # Column for the y-axis (line count)
-        title="Line Count by repo name"
+        x="Name",  # Repository name on the x-axis
+        y="LineCount",  # Line count on the y-axis
+        title="Line Count by Repository Name"
     )
+    return fig.to_json()  # Return the figure as JSON
 
-    return fig.to_json()
-
-
-def generate_bubble_chart(data):
+# Bubble chart plots showing repository activity
+def generate_bubble_chart_plots(data):
     if not data:
-        raise ValueError("No data available for the bubble chart.")
-    print(data)
+        raise ValueError("No data available for the bubble chart.")  # Handle empty data.
+
+    # Extract data for the bubble chart
     repository_names = data["repository_name"]
     commit_counts = data["commit_count"]
     watcher_counts = data["watcher_count"]
     fork_counts = data["fork_count"]
-    
-    print("Repository Names:", repository_names)
-    print("Watcher Counts:", watcher_counts)
-    print("Commit Counts:", commit_counts)
-    print("Fork Counts:", fork_counts)
-    print("Lengths:", len(repository_names), len(watcher_counts), len(commit_counts), len(fork_counts))
 
-
-    min_size = 20  # Minimum bubble size
-    scale_factor = 100 / max(fork_counts) if max(fork_counts) > 0 else 1  # Scale so the largest bubble isn't too big
+    # Calculate bubble sizes based on fork counts, with a minimum size.
+    min_size = 20
+    scale_factor = 100 / max(fork_counts) if max(fork_counts) > 0 else 1  # Avoid divide by zero.
     fork_counts = [max(min_size, size * scale_factor) for size in fork_counts]
-    
+
+    # Create a scatter plot for the bubble chart.
     fig = px.scatter(
-        x=watcher_counts,
-        y=commit_counts,
-        size=fork_counts,
-        text=repository_names,
-        labels={"x": "Number of Watchers", "y": "Number of Commits"},
+        x=watcher_counts,  # Watcher counts on the x-axis.
+        y=commit_counts,  # Commit counts on the y-axis.
+        size=fork_counts,  # Bubble size based on fork counts.
+        text=repository_names,  # Repository names as text labels.
+        labels={"x": "Number of Watchers", "y": "Number of Commits"},  # Axis labels.
         title="Commits vs. Watchers Bubble Chart",
     )
-    fig.update_traces(textposition='top center')
-    fig.update_layout(template="plotly_white")
+    fig.update_traces(textposition='top center')  # Adjust text position for readability.
+    fig.update_layout(template="plotly_white")  # Apply a white template for the chart.
+    return fig.to_json()  # Return the figure as JSON.
+
+# Generates a pie chart showing commit contributions by each author.
+def generate_author_plots(data):
+    # Input:
+    # - data (dict): Contains keys 'Author' and 'Commit Count'.
+    # Output:
+    # - Returns the pie chart as a JSON representation.
+    fig = px.pie(
+        values=data["Commit Count"],  # Commit counts for the pie slices.
+        names=data["Author"],        # Author names as labels.
+        title="Commit Contributions by Author"
+    )
     return fig.to_json()
+
+# Creates a bar chart to display file names and their corresponding line counts.
+def generate_author_barchart_plots(data):
+    # Input:
+    # - data (dict): Contains "File Name" and "Line Count".
+    # Output:
+    # - Returns the bar chart as a JSON representation.
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=data["File Name"],       # File names on the x-axis.
+            y=data["Line Count"],      # Line counts on the y-axis.
+            marker_color="blue",       # Bar color.
+            text=data["Line Count"],   # Display line counts on the bars.
+            textposition="auto"        # Position text automatically.
+        )
+    )
+
+    fig.update_layout(
+        title="Line Count by File Name",  # Chart title.
+        xaxis_title="File Name",          # Label for the x-axis.
+        yaxis_title="Line Count",         # Label for the y-axis.
+        template="plotly_white"           # Use a clean white template.
+    )
+
+    return fig.to_json()
+
+# Generates a histogram showing commit counts over a period of time.
+def generate_author_histogram_plots(data):
+    # Input:
+    # - data (dict): Contains "Commit Dates" and "Commit Counts".
+    # Output:
+    # - Returns the histogram as a JSON representation.
+    fig = px.histogram(
+        data_frame=data,
+        x="Commit Dates",          # Dates for the x-axis bins.
+        y="Commit Counts",         # Commit counts for the y-axis.
+        title="Commits Over Time", # Chart title.
+        labels={"Commit Dates": "Dates", "Commit Counts": "Number of Commits"}
+    )
+    return fig.to_json()
+
